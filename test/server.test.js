@@ -33,6 +33,30 @@ test("API routes return route-specific Allow headers", async () => {
   });
 });
 
+test("rejects oversized query bodies with 413", async () => {
+  await withServer(async (base) => {
+    const response = await fetch(`${base}/api/query`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ query: "x".repeat(9000) })
+    });
+    const body = await response.json();
+    assert.equal(response.status, 413);
+    assert.match(body.error, /too large/i);
+  });
+});
+
+test("static path traversal variants never expose server source", async () => {
+  await withServer(async (base) => {
+    for (const path of ["/../server.js", "/%2e%2e/server.js", "/..%2fserver.js", "/%2e%2e%2fserver.js"]) {
+      const response = await fetch(`${base}${path}`);
+      const body = await response.text();
+      assert.equal(response.status, 404, `expected 404 for ${path}`);
+      assert.doesNotMatch(body, /createServer|validateQueryRequest|queryLocalKnowledge/);
+    }
+  });
+});
+
 test("health endpoint explicitly reports local-demo mode", async () => {
   await withServer(async (base) => {
     const response = await fetch(`${base}/api/health`);
