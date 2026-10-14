@@ -97,7 +97,7 @@ test("does not accept unsupported methods on query route", async () => {
   await withServer(async (base) => {
     const response = await fetch(`${base}/api/query`, { method: "PUT" });
     assert.equal(response.status, 405);
-    assert.equal(response.headers.get("allow"), "GET, HEAD, POST");
+    assert.equal(response.headers.get("allow"), "POST");
   });
 });
 
