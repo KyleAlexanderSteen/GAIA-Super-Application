@@ -13,6 +13,50 @@ async function withServer(run) {
   }
 }
 
+test("API routes return route-specific Allow headers", async () => {
+  await withServer(async (base) => {
+    const queryGet = await fetch(`${base}/api/query`);
+    assert.equal(queryGet.status, 405);
+    assert.equal(queryGet.headers.get("allow"), "POST");
+
+    const healthPost = await fetch(`${base}/api/health`, { method: "POST" });
+    assert.equal(healthPost.status, 405);
+    assert.equal(healthPost.headers.get("allow"), "GET");
+
+    const staticPut = await fetch(`${base}/index.html`, { method: "PUT" });
+    assert.equal(staticPut.status, 405);
+    assert.equal(staticPut.headers.get("allow"), "GET, HEAD");
+
+    const unknownApi = await fetch(`${base}/api/not-a-route`);
+    assert.equal(unknownApi.status, 404);
+    assert.ok((await unknownApi.json()).error);
+  });
+});
+
+test("rejects oversized query bodies with 413", async () => {
+  await withServer(async (base) => {
+    const response = await fetch(`${base}/api/query`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ query: "x".repeat(9000) })
+    });
+    const body = await response.json();
+    assert.equal(response.status, 413);
+    assert.match(body.error, /too large/i);
+  });
+});
+
+test("static path traversal variants never expose server source", async () => {
+  await withServer(async (base) => {
+    for (const path of ["/../server.js", "/%2e%2e/server.js", "/..%2fserver.js", "/%2e%2e%2fserver.js"]) {
+      const response = await fetch(`${base}${path}`);
+      const body = await response.text();
+      assert.equal(response.status, 404, `expected 404 for ${path}`);
+      assert.doesNotMatch(body, /createServer|validateQueryRequest|queryLocalKnowledge/);
+    }
+  });
+});
+
 test("health endpoint explicitly reports local-demo mode", async () => {
   await withServer(async (base) => {
     const response = await fetch(`${base}/api/health`);
@@ -77,7 +121,7 @@ test("does not accept unsupported methods on query route", async () => {
   await withServer(async (base) => {
     const response = await fetch(`${base}/api/query`, { method: "PUT" });
     assert.equal(response.status, 405);
-    assert.equal(response.headers.get("allow"), "GET, HEAD, POST");
+    assert.equal(response.headers.get("allow"), "POST");
   });
 });
 
