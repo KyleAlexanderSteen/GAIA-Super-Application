@@ -81,6 +81,21 @@ test("does not accept unsupported methods on query route", async () => {
   });
 });
 
+test("HEAD static response has GET headers and no response body", async () => {
+  await withServer(async (base) => {
+    const get = await fetch(`${base}/index.html`);
+    const getBody = await get.text();
+    const head = await fetch(`${base}/index.html`, { method: "HEAD" });
+    const headBody = await head.text();
+
+    assert.equal(get.status, 200);
+    assert.equal(head.status, 200);
+    assert.equal(head.headers.get("content-type"), get.headers.get("content-type"));
+    assert.equal(head.headers.get("content-length"), String(Buffer.byteLength(getBody)));
+    assert.equal(headBody, "");
+  });
+});
+
 test("serves the accessible application shell", async () => {
   await withServer(async (base) => {
     const response = await fetch(base);
