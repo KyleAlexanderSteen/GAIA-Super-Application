@@ -1,0 +1,16 @@
+{
+  "name": "gaia-super-application",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Public GAIA application shell — Phase A local knowledge-query slice",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test",
+    "check": "node --check server.js && node --check src/contract.js && node --check src/knowledge.js && node --check public/app.js && node --test"
+  }
+}
