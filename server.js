@@ -47,7 +47,7 @@ async function readJsonBody(request) {
 
 async function serveStatic(pathname, method, response) {
   const requested = pathname === "/" ? "/index.html" : pathname;
-  const normalized = normalize(requested).replace(/^([.][.][/\\\\])+/, "");
+  const normalized = normalize(requested).replace(/^([.][.][/\\])+/, "");
   const filePath = join(PUBLIC_DIR, normalized);
   if (filePath !== PUBLIC_DIR && !filePath.startsWith(PUBLIC_DIR + sep)) {
     response.writeHead(404);
