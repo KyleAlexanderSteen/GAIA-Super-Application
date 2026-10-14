@@ -45,9 +45,9 @@ async function readJsonBody(request) {
   }
 }
 
-async function serveStatic(pathname, response) {
+async function serveStatic(pathname, method, response) {
   const requested = pathname === "/" ? "/index.html" : pathname;
-  const normalized = normalize(requested).replace(/^([.][.][/\\])+/, "");
+  const normalized = normalize(requested).replace(/^([.][.][/\\\\])+/, "");
   const filePath = join(PUBLIC_DIR, normalized);
   if (filePath !== PUBLIC_DIR && !filePath.startsWith(PUBLIC_DIR + sep)) {
     response.writeHead(404);
@@ -59,12 +59,14 @@ async function serveStatic(pathname, response) {
     const data = await readFile(filePath);
     response.writeHead(200, {
       "content-type": MIME_TYPES[extname(filePath)] ?? "application/octet-stream",
+      "content-length": data.byteLength,
       "x-content-type-options": "nosniff",
       "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; frame-ancestors 'none'",
       "referrer-policy": "no-referrer",
       "cache-control": "no-store"
     });
-    response.end(data);
+    // HEAD returns the headers a GET would return, but never the representation body.
+    response.end(method === "HEAD" ? undefined : data);
   } catch {
     response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
     response.end("Not found");
@@ -113,7 +115,7 @@ export function createAppServer() {
       return;
     }
 
-    await serveStatic(url.pathname, response);
+    await serveStatic(url.pathname, request.method, response);
   });
 }
 
