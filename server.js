@@ -75,7 +75,12 @@ export function createAppServer() {
   return createHttpServer(async (request, response) => {
     const url = new URL(request.url ?? "/", "http://localhost");
 
-    if (request.method === "GET" && url.pathname === "/api/health") {
+    if (url.pathname === "/api/health") {
+      if (request.method !== "GET") {
+        response.writeHead(405, { allow: "GET" });
+        response.end("Method not allowed");
+        return;
+      }
       sendJson(response, 200, {
         status: "ok",
         mode: "local-demo",
@@ -84,7 +89,12 @@ export function createAppServer() {
       return;
     }
 
-    if (request.method === "POST" && url.pathname === "/api/query") {
+    if (url.pathname === "/api/query") {
+      if (request.method !== "POST") {
+        response.writeHead(405, { allow: "POST" });
+        response.end("Method not allowed");
+        return;
+      }
       try {
         const raw = await readJsonBody(request);
         const validated = validateQueryRequest(raw);
@@ -107,8 +117,14 @@ export function createAppServer() {
       return;
     }
 
+    // Unknown API paths should not fall through to static-file lookup.
+    if (url.pathname.startsWith("/api/")) {
+      sendJson(response, 404, { error: "Not found" });
+      return;
+    }
+
     if (request.method !== "GET" && request.method !== "HEAD") {
-      response.writeHead(405, { allow: "GET, HEAD, POST" });
+      response.writeHead(405, { allow: "GET, HEAD" });
       response.end("Method not allowed");
       return;
     }
