@@ -13,6 +13,26 @@ async function withServer(run) {
   }
 }
 
+test("API routes return route-specific Allow headers", async () => {
+  await withServer(async (base) => {
+    const queryGet = await fetch(`${base}/api/query`);
+    assert.equal(queryGet.status, 405);
+    assert.equal(queryGet.headers.get("allow"), "POST");
+
+    const healthPost = await fetch(`${base}/api/health`, { method: "POST" });
+    assert.equal(healthPost.status, 405);
+    assert.equal(healthPost.headers.get("allow"), "GET");
+
+    const staticPut = await fetch(`${base}/index.html`, { method: "PUT" });
+    assert.equal(staticPut.status, 405);
+    assert.equal(staticPut.headers.get("allow"), "GET, HEAD");
+
+    const unknownApi = await fetch(`${base}/api/not-a-route`);
+    assert.equal(unknownApi.status, 404);
+    assert.ok((await unknownApi.json()).error);
+  });
+});
+
 test("health endpoint explicitly reports local-demo mode", async () => {
   await withServer(async (base) => {
     const response = await fetch(`${base}/api/health`);
