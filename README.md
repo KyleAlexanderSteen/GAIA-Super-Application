@@ -4,7 +4,7 @@ The public-facing GAIA application. This repository owns the public product UI a
 
 ## Phase A: local knowledge-query slice
 
-This branch introduces a **local-only development prototype** to establish the application shell, a versioned request/response boundary, provenance-labelled fixture data, failure states, and repeatable tests.
+This branch introduces a **local-only development prototype** to establish the application shell, a versioned request/response boundary, provenance-labelled fixture data, failure states, repeatable tests, and a workspace navigation foundation.
 
 It is not a live GAIA runtime integration and is not a production deployment.
 
@@ -39,6 +39,8 @@ The test suite uses Node's built-in test runner and local HTTP requests. The CI 
 ### What works in this phase
 
 - Responsive, keyboard-friendly public application shell.
+- Primary workspace navigation with Knowledge marked as available.
+- Chat, Research, Projects, Agents / Automation, Memory, and Settings shown as planned and disabled until implemented.
 - Query form with loading, success, no-match, and error feedback.
 - Local deterministic search over a small fixture set.
 - Source metadata: stable fixture ID, title, source type, and version.
@@ -52,6 +54,7 @@ The test suite uses Node's built-in test runner and local HTTP requests. The CI 
 - No live AI provider, API Gateway, authentication, personal memory, external tool, or privileged operation is connected.
 - The local fixture data is demonstration material, not authoritative GAIA knowledge.
 - The local query endpoint is not an authenticated production API. Do not expose this development server to the public internet.
+- Navigation for unimplemented workspaces is intentionally disabled; no live functionality is implied.
 - The Content Security Policy and input validation are prototype hardening, not a substitute for the approved GAIA security model.
 - No production readiness or integration verification is claimed by this scaffold.
 

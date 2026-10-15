@@ -147,5 +147,19 @@ test("serves the accessible application shell", async () => {
     assert.equal(response.status, 200);
     assert.match(html, /aria-live="polite"/);
     assert.match(html, /Prototype mode/);
+    assert.match(html, /aria-label="Primary workspaces"/);
+  });
+});
+
+test("workspace navigation marks Knowledge available and other workspaces planned", async () => {
+  await withServer(async (base) => {
+    const response = await fetch(base);
+    const html = await response.text();
+    assert.equal(response.status, 200);
+    assert.match(html, /href="\/" aria-current="page">Knowledge/);
+    for (const workspace of ["Chat", "Research", "Projects", "Agents \/ Automation", "Memory", "Settings"]) {
+      const escaped = workspace.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      assert.match(html, new RegExp(`<button class="workspace-link" type="button" disabled>${escaped} <span class="nav-state">Planned</span><\\/button>`));
+    }
   });
 });
