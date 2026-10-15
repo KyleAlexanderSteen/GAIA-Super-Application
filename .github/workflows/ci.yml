@@ -18,5 +18,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Run syntax checks and tests
+      - name: Install development dependencies
+        run: npm install
+      - name: Install Chromium for browser verification
+        run: npx playwright install --with-deps chromium
+      - name: Run syntax checks, unit tests, and browser tests
         run: npm run check
