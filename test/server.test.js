@@ -188,3 +188,19 @@ test("serves reusable design tokens and accessibility state styles", async () =>
     assert.match(css, /prefers-reduced-motion/);
   });
 });
+
+
+test("provides a keyboard skip link to the main content landmark", async () => {
+  await withServer(async (base) => {
+    const response = await fetch(base);
+    const html = await response.text();
+    assert.equal(response.status, 200);
+    assert.match(html, /<a class="skip-link" href="#main-content">Skip to main content<\\/a>/);
+    assert.match(html, /<main id="main-content" class="layout" tabindex="-1">/);
+
+    const cssResponse = await fetch(`${base}/styles.css`);
+    const css = await cssResponse.text();
+    assert.match(css, /\.skip-link:focus/);
+    assert.match(css, /transform: translateY\(0\)/);
+  });
+});
