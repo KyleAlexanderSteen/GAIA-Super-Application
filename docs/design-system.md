@@ -30,6 +30,10 @@ These are the initial vocabulary, not a claim that every component has already m
 - **Unverified:** use the caution treatment; do not imply a health check proves production readiness.
 - **Planned:** unavailable workspaces remain disabled and visibly labelled until their behavior exists.
 
+## API adapter boundary
+
+The browser UI calls `public/api-client.js` rather than issuing HTTP requests directly from the form and health-status handlers. Its `createLocalDemoApi` interface isolates the current local-demo endpoints and normalizes unreadable/error responses for the UI. This is **not** the approved GAIA API Gateway client, does not authenticate requests, and does not connect a live provider. Replace or adapt this boundary only after the canonical ownership and contract decisions are approved.
+
 ## Adding a workspace
 
 1. Confirm the feature's owning repository and approved API/event contract before integrating backend behavior.

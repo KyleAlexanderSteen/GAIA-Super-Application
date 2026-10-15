@@ -1,3 +1,6 @@
+import { createLocalDemoApi } from "./api-client.js";
+
+const api = createLocalDemoApi();
 const form = document.querySelector("#query-form");
 const input = document.querySelector("#query-input");
 const button = document.querySelector("#submit-button");
@@ -43,9 +46,7 @@ function renderResult(data) {
 
 async function checkHealth() {
   try {
-    const response = await fetch("/api/health", { headers: { accept: "application/json" } });
-    if (!response.ok) throw new Error("Service unavailable");
-    const health = await response.json();
+    const health = await api.health();
     if (health.mode === "local-demo") {
       healthBadge.textContent = "Local demo · not connected";
       healthBadge.dataset.state = "unverified";
@@ -75,19 +76,7 @@ form.addEventListener("submit", async (event) => {
   showFeedback("Searching the fixed local knowledge fixtures…", "loading");
 
   try {
-    const response = await fetch("/api/query", {
-      method: "POST",
-      headers: { "content-type": "application/json", accept: "application/json" },
-      body: JSON.stringify({ query })
-    });
-    let data;
-    try {
-      data = await response.json();
-    } catch {
-      throw new Error("The local service returned an unreadable response. Please try again.");
-    }
-    if (!response.ok) throw new Error(data.error ?? "The query could not be completed.");
-
+    const data = await api.query(query);
     renderResult(data);
     showFeedback(
       data.status === "matched"

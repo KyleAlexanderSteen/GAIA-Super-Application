@@ -38,7 +38,7 @@ The test suite uses Node's built-in test runner and local HTTP requests. The CI 
 
 ### Design conventions
 
-See [`docs/design-system.md`](docs/design-system.md) for the initial color, spacing, shape, accessibility, and UI-state conventions. The token set is a foundation; visual/browser audits remain outstanding.
+See [`docs/design-system.md`](docs/design-system.md) for the initial color, spacing, shape, accessibility, UI-state, and local API-adapter conventions. The token set is a foundation; visual/browser audits remain outstanding.
 
 ### What works in this phase
 
@@ -48,9 +48,9 @@ See [`docs/design-system.md`](docs/design-system.md) for the initial color, spac
 - Query form with loading, success, no-match, and error feedback.
 - Local deterministic search over a small fixture set.
 - Source metadata: stable fixture ID, title, source type, and version.
-- Versioned local request/response contract.
+- Versioned local request/response contract, isolated behind a browser-side local-demo adapter.
 - Health endpoint and bounded request validation.
-- Tests for query validation, provenance, no-match behavior, malformed JSON, unsupported methods, and the served UI.
+- Tests for query validation, provenance, no-match behavior, malformed JSON, unsupported methods, adapter request/response behavior, and the served UI.
 
 ### Explicit limitations
 
