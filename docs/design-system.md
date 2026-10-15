@@ -1,6 +1,6 @@
 # Public application design system (Phase A)
 
-This is the initial design-system contract for `GAIA-Super-Application`. It is intentionally framework-free and implemented in `public/styles.css` so the current Node.js application can use it without adding dependencies.
+This is the initial design-system contract for `GAIA-Super-Application`. The public shell uses framework-free HTML, CSS, and JavaScript so the application can establish its foundation without a third-party runtime UI framework.
 
 ## Principles
 
@@ -34,6 +34,17 @@ These are the initial vocabulary, not a claim that every component has already m
 
 The browser UI calls `public/api-client.js` rather than issuing HTTP requests directly from the form and health-status handlers. Its `createLocalDemoApi` interface isolates the current local-demo endpoints and normalizes unreadable/error responses for the UI. This is **not** the approved GAIA API Gateway client, does not authenticate requests, and does not connect a live provider. Replace or adapt this boundary only after the canonical ownership and contract decisions are approved.
 
+## Browser verification
+
+The Playwright Chromium smoke suite is in `test/browser-interaction.test.js`. It verifies:
+
+- The keyboard skip link receives focus first, is visible when focused, and navigates to the main landmark.
+- A real browser can submit a query, render a local fixture response, and display source provenance.
+- Blank/whitespace input reports validation feedback without sending an API request.
+- Workspace navigation has an accessible label, planned areas remain disabled, and the narrow viewport does not force page-wide horizontal scrolling.
+
+These tests verify selected behaviors only. They do **not** constitute a complete WCAG conformance audit, screen-reader/assistive-technology test, automated axe scan, or cross-browser matrix. Those remain explicit follow-up work.
+
 ## Adding a workspace
 
 1. Confirm the feature's owning repository and approved API/event contract before integrating backend behavior.
@@ -45,4 +56,4 @@ The browser UI calls `public/api-client.js` rather than issuing HTTP requests di
 
 ## Verification baseline
 
-Run `npm test` and `npm run check` with Node.js 20 or later. The current suite uses Node's built-in test runner; no third-party UI framework or component-test package is installed. Browser-level visual and accessibility audits remain a follow-up, not an already completed check.
+Install development dependencies and Chromium with `npm install` and `npx playwright install chromium`, then run `npm test` and `npm run check` with Node.js 20 or later. CI performs the same browser setup before running checks. No third-party UI framework or runtime integration is introduced by this browser-test step.
