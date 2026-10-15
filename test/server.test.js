@@ -195,7 +195,7 @@ test("provides a keyboard skip link to the main content landmark", async () => {
     const response = await fetch(base);
     const html = await response.text();
     assert.equal(response.status, 200);
-    assert.match(html, /<a class="skip-link" href="#main-content">Skip to main content<\\/a>/);
+    assert.ok(html.includes('<a class="skip-link" href="#main-content">Skip to main content</a>'));
     assert.match(html, /<main id="main-content" class="layout" tabindex="-1">/);
 
     const cssResponse = await fetch(`${base}/styles.css`);
