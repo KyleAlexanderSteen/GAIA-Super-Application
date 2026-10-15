@@ -39,20 +39,21 @@
         </div>
       </section>
 
-      <section class="workspace" aria-labelledby="query-title">
+      <section id="query-workspace" class="workspace" aria-labelledby="query-title" aria-busy="false">
         <div class="workspace-heading">
           <div>
             <p class="eyebrow">ASK GAIA</p>
             <h2 id="query-title">Search the local knowledge set</h2>
           </div>
-          <span id="health-badge" class="health-badge" role="status">Checking service…</span>
+          <span id="health-badge" class="health-badge" role="status" data-state="unverified">Checking local demo…</span>
         </div>
 
         <form id="query-form">
           <label for="query-input">Your question</label>
-          <textarea id="query-input" name="query" rows="3" maxlength="500" placeholder="Try: How should GAIA track evidence and implementation status?" required></textarea>
+          <textarea id="query-input" name="query" rows="3" maxlength="500" aria-describedby="query-help character-count" placeholder="Try: How should GAIA track evidence and implementation status?" required></textarea>
+          <p id="query-help" class="field-help">Use up to 500 characters. Searches use fixed local fixtures only; do not enter secrets or sensitive personal information.</p>
           <div class="form-footer">
-            <span id="character-count" class="muted">0 / 500</span>
+            <span id="character-count" class="muted" aria-live="off">0 / 500</span>
             <button id="submit-button" type="submit">Search knowledge <span aria-hidden="true">→</span></button>
           </div>
         </form>
