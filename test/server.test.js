@@ -163,3 +163,15 @@ test("workspace navigation marks Knowledge available and other workspaces planne
     }
   });
 });
+
+test("served query form documents local-only input and explicit unverified status", async () => {
+  await withServer(async (base) => {
+    const response = await fetch(base);
+    const html = await response.text();
+    assert.equal(response.status, 200);
+    assert.match(html, /id="query-workspace"[^>]*aria-busy="false"/);
+    assert.match(html, /aria-describedby="query-help character-count"/);
+    assert.match(html, /do not enter secrets or sensitive personal information/i);
+    assert.match(html, /data-state="unverified">Checking local demo/);
+  });
+});
