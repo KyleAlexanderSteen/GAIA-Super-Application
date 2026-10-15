@@ -10,6 +10,7 @@
     <script type="module" src="/app.js"></script>
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <header class="topbar">
       <a class="brand" href="/" aria-label="GAIA home">
         <span class="brand-mark" aria-hidden="true">G</span>
@@ -28,7 +29,7 @@
       <button class="workspace-link" type="button" disabled>Settings <span class="nav-state">Planned</span></button>
     </nav>
 
-    <main class="layout">
+    <main id="main-content" class="layout" tabindex="-1">
       <section class="intro" aria-labelledby="page-title">
         <p class="eyebrow">KNOWLEDGE EXPLORER · PHASE A</p>
         <h1 id="page-title">A clearer path to knowledge.</h1>

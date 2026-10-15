@@ -152,3 +152,28 @@ a.workspace-link[aria-current="page"] .nav-state {
 textarea:disabled {
   opacity: .8;
 }
+
+
+/* Keyboard users can bypass repeated navigation and reach the main landmark. */
+.skip-link {
+  position: absolute;
+  z-index: 100;
+  top: var(--space-2);
+  left: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  transform: translateY(calc(-100% - var(--space-2)));
+  border: 2px solid var(--focus-ring);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--green-dark);
+  font-weight: 750;
+  text-decoration: none;
+}
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+#main-content:focus {
+  outline: none;
+}
