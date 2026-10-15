@@ -4,18 +4,20 @@ The public-facing GAIA application. This repository owns the public product UI a
 
 ## Phase A: local knowledge-query slice
 
-This branch introduces a **local-only development prototype** to establish the application shell, a versioned request/response boundary, provenance-labelled fixture data, failure states, repeatable tests, and a workspace navigation foundation.
+This is a **local-only development prototype** that establishes the application shell, a versioned request/response boundary, provenance-labelled fixture data, failure states, repeatable tests, and a workspace navigation foundation.
 
 It is not a live GAIA runtime integration and is not a production deployment.
 
 ### Requirements
 
 - Node.js 22 recommended (Node.js 20 or later supported).
-- No package installation or third-party runtime dependency is required.
+- No runtime dependency is needed to run the server. Development verification uses Playwright for Chromium browser tests.
 
 ### Run locally
 
 ```sh
+npm install
+npx playwright install chromium
 npm start
 ```
 
@@ -34,11 +36,13 @@ npm test
 npm run check
 ```
 
-The test suite uses Node's built-in test runner and local HTTP requests. The CI workflow runs syntax checks and tests on pull requests and pushes to `main`.
+The test suite uses Node's built-in test runner for API/server checks and Playwright with Chromium for real-browser interaction smoke tests. CI installs development dependencies and Chromium, then runs syntax checks, unit/HTTP tests, and browser tests on pull requests and pushes to `main`.
+
+Browser checks currently cover keyboard skip-link behavior, a successful local-fixture query with provenance, blank-query handling, navigation labels, and narrow-viewport horizontal overflow. These are focused regression checks—not a full WCAG audit, assistive-technology certification, or cross-browser test matrix.
 
 ### Design conventions
 
-See [`docs/design-system.md`](docs/design-system.md) for the initial color, spacing, shape, accessibility, UI-state, and local API-adapter conventions. The token set is a foundation; visual/browser audits remain outstanding.
+See [`docs/design-system.md`](docs/design-system.md) for the initial color, spacing, shape, accessibility, UI-state, API-adapter, and browser-verification conventions. The token set is a foundation; a full visual/accessibility audit remains outstanding.
 
 ### What works in this phase
 
@@ -50,7 +54,7 @@ See [`docs/design-system.md`](docs/design-system.md) for the initial color, spac
 - Source metadata: stable fixture ID, title, source type, and version.
 - Versioned local request/response contract, isolated behind a browser-side local-demo adapter.
 - Health endpoint and bounded request validation.
-- Tests for query validation, provenance, no-match behavior, malformed JSON, unsupported methods, adapter request/response behavior, and the served UI.
+- Automated server/API and Chromium browser tests for key interactions and selected accessibility/responsive behaviors.
 
 ### Explicit limitations
 
