@@ -121,3 +121,20 @@ a.workspace-link[aria-current="page"] .nav-state {
   .workspace-nav { gap: 4px; padding: 10px 12px; }
   .workspace-link { padding: 8px 10px; }
 }
+
+/* Explicit connection and request states: unverified is not success. */
+.health-badge[data-state="unverified"] {
+  background: var(--soft-amber);
+  color: var(--amber);
+}
+.workspace[aria-busy="true"] {
+  cursor: progress;
+}
+.field-help {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: .8rem;
+}
+textarea:disabled {
+  opacity: .8;
+}
