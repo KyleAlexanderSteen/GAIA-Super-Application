@@ -36,6 +36,10 @@ npm run check
 
 The test suite uses Node's built-in test runner and local HTTP requests. The CI workflow runs syntax checks and tests on pull requests and pushes to `main`.
 
+### Design conventions
+
+See [`docs/design-system.md`](docs/design-system.md) for the initial color, spacing, shape, accessibility, and UI-state conventions. The token set is a foundation; visual/browser audits remain outstanding.
+
 ### What works in this phase
 
 - Responsive, keyboard-friendly public application shell.
