@@ -175,3 +175,16 @@ test("served query form documents local-only input and explicit unverified statu
     assert.match(html, /data-state="unverified">Checking local demo/);
   });
 });
+
+test("serves reusable design tokens and accessibility state styles", async () => {
+  await withServer(async (base) => {
+    const response = await fetch(`${base}/styles.css`);
+    const css = await response.text();
+    assert.equal(response.status, 200);
+    for (const token of ["--focus-ring:", "--radius-control:", "--radius-field:", "--radius-card:", "--shadow-card:", "--soft-red:", "--soft-blue:"]) {
+      assert.ok(css.includes(token), `expected design token ${token}`);
+    }
+    assert.match(css, /:focus-visible/);
+    assert.match(css, /prefers-reduced-motion/);
+  });
+});
