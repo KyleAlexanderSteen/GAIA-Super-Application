@@ -11,6 +11,20 @@
   --amber: #77531b;
   --soft-amber: #fbf2df;
   --red: #8b3030;
+  --soft-red: #faeaea;
+  --blue: #354e6c;
+  --soft-blue: #eef2f7;
+  --focus-ring: #8dbda0;
+  --radius-control: 10px;
+  --radius-card: 20px;
+  --radius-field: 12px;
+  --shadow-card: 0 12px 36px rgba(30, 54, 38, .045);
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 * { box-sizing: border-box; }
@@ -27,24 +41,24 @@ h1 { max-width: 720px; margin: 0; font-size: clamp(2.2rem, 6vw, 4.1rem); line-he
 .lead { max-width: 650px; margin: 20px 0 26px; color: var(--muted); font-size: 1.1rem; }
 .notice { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; padding: 14px 16px; border: 1px solid #e9d8b2; border-radius: 12px; background: var(--soft-amber); color: #513d1e; font-size: .9rem; }
 .notice strong { white-space: nowrap; }
-.workspace { padding: clamp(20px, 4vw, 34px); border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: 0 12px 36px rgba(30, 54, 38, .045); }
+.workspace { padding: clamp(20px, 4vw, 34px); border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); box-shadow: var(--shadow-card); }
 .workspace-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; margin-bottom: 26px; }
 h2 { margin: 0; font-size: clamp(1.2rem, 3vw, 1.6rem); letter-spacing: -.025em; }
 .health-badge { border-radius: 999px; padding: 6px 10px; background: #eef0ed; color: var(--muted); font-size: .75rem; font-weight: 700; }
 .health-badge[data-state="ok"] { background: var(--soft-green); color: var(--green-dark); }
-.health-badge[data-state="error"] { background: #faeaea; color: var(--red); }
+.health-badge[data-state="error"] { background: var(--soft-red); color: var(--red); }
 label { display: block; margin-bottom: 8px; font-weight: 700; font-size: .9rem; }
-textarea { width: 100%; resize: vertical; min-height: 110px; padding: 14px; border: 1px solid #cbd5cd; border-radius: 12px; color: var(--ink); background: #fcfdfc; font: inherit; }
-textarea:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid #8dbda0; outline-offset: 3px; }
+textarea { width: 100%; resize: vertical; min-height: 110px; padding: 14px; border: 1px solid #cbd5cd; border-radius: var(--radius-field); color: var(--ink); background: #fcfdfc; font: inherit; }
+textarea:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
 .form-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; }
 .muted { color: var(--muted); font-size: .8rem; }
-button { border: 0; border-radius: 10px; padding: 12px 16px; background: var(--green); color: white; font: inherit; font-weight: 700; cursor: pointer; }
+button { border: 0; border-radius: var(--radius-control); padding: 12px 16px; background: var(--green); color: white; font: inherit; font-weight: 700; cursor: pointer; }
 button:hover:not(:disabled) { background: var(--green-dark); }
 button:disabled { opacity: .65; cursor: wait; }
 .feedback { margin-top: 18px; padding: 12px 14px; border-radius: 10px; background: #f2f4f2; color: var(--muted); font-size: .9rem; }
 .feedback[data-kind="success"] { background: var(--soft-green); color: var(--green-dark); }
 .feedback[data-kind="error"] { background: #faeaea; color: var(--red); }
-.feedback[data-kind="loading"] { background: #eef2f7; color: #354e6c; }
+.feedback[data-kind="loading"] { background: var(--soft-blue); color: var(--blue); }
 .result { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--line); }
 .result-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .fixture-tag { padding: 4px 8px; border-radius: 6px; background: var(--soft-amber); color: var(--amber); font-size: .72rem; font-weight: 800; }
