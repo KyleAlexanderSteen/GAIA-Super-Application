@@ -37,7 +37,7 @@ test("AI Systems Explorer renders truthful local entries and filters by category
   assert.match(await page.locator("#provider-catalog").innerText(), /Cosmos/);
   assert.doesNotMatch(await page.locator("#provider-catalog").innerText(), /Nemotron/);
 
-  await page.getByRole("combobox", { name: "Filter by capability" }).selectOption("does-not-exist");
+  await page.getByRole("combobox", { name: "Filter by capability" }).selectOption("reasoning");
   assert.match(await page.locator("#catalog-status").innerText(), /No catalogue entries match/);
   assert.equal(await page.locator(".provider-card").count(), 0);
 
