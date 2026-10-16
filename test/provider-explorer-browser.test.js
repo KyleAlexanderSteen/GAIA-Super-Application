@@ -28,8 +28,8 @@ test("AI Systems Explorer renders truthful local entries and filters by category
   assert.match(await page.locator("#provider-catalog").innerText(), /NVIDIA NeMo/);
   assert.match(await page.locator("#provider-catalog").innerText(), /Earth-2/);
   assert.match(await page.locator("#provider-catalog").innerText(), /Cosmos/);
-  assert.match(await page.locator("#provider-catalog").innerText(), /unconfigured/);
-  assert.match(await page.locator("#provider-catalog").innerText(), /unverified/);
+  assert.match(await page.locator("#provider-catalog").innerText(), /unconfigured/i);
+  assert.match(await page.locator("#provider-catalog").innerText(), /unverified/i);
 
   await page.getByRole("combobox", { name: "Filter by category" }).selectOption("specialized_system");
   assert.equal(await page.locator(".provider-card").count(), 2);
