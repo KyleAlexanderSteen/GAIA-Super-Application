@@ -1,5 +1,4 @@
 import { createLocalDemoApi } from "./api-client.js";
-import { INITIAL_REGISTRY, filterRegistry } from "../src/provider-registry.js";
 
 const api = createLocalDemoApi();
 const form = document.querySelector("#query-form");
@@ -98,6 +97,8 @@ const capabilityFilter = document.querySelector("#capability-filter");
 const kindFilter = document.querySelector("#kind-filter");
 const catalogStatus = document.querySelector("#catalog-status");
 const providerCatalog = document.querySelector("#provider-catalog");
+let providerEntries = [];
+let catalogLoadError = false;
 
 function appendTextElement(parent, tagName, text, className) {
   const element = document.createElement(tagName);
@@ -108,10 +109,10 @@ function appendTextElement(parent, tagName, text, className) {
 }
 
 function renderProviderCatalog() {
-  const entries = filterRegistry(INITIAL_REGISTRY, {
-    capability: capabilityFilter.value || undefined,
-    kind: kindFilter.value || undefined
-  });
+  const entries = providerEntries.filter((entry) =>
+    (!capabilityFilter.value || entry.capabilities.includes(capabilityFilter.value)) &&
+    (!kindFilter.value || entry.kind === kindFilter.value)
+  );
   providerCatalog.replaceChildren();
 
   for (const entry of entries) {
@@ -141,12 +142,26 @@ function renderProviderCatalog() {
     providerCatalog.append(card);
   }
 
-  catalogStatus.textContent = entries.length
-    ? `${entries.length} catalogue entries · all seeded entries are unconfigured and unverified.`
-    : "No catalogue entries match these filters. Try another capability or category.";
+  if (catalogLoadError) {
+    catalogStatus.textContent = "The local catalogue is unavailable. No provider connection is implied.";
+  } else if (entries.length) {
+    catalogStatus.textContent = `${entries.length} catalogue entries · all seeded entries are unconfigured and unverified.`;
+  } else {
+    catalogStatus.textContent = "No catalogue entries match these filters. Try another capability or category.";
+  }
+}
+
+async function loadProviderCatalog() {
+  try {
+    const data = await api.providers();
+    providerEntries = data.providers;
+  } catch {
+    catalogLoadError = true;
+  }
+  renderProviderCatalog();
 }
 
 capabilityFilter.addEventListener("change", renderProviderCatalog);
 kindFilter.addEventListener("change", renderProviderCatalog);
-renderProviderCatalog();
+loadProviderCatalog();
 checkHealth();
