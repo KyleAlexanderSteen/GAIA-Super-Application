@@ -1,4 +1,5 @@
 import { createLocalDemoApi } from "./api-client.js";
+import { INITIAL_REGISTRY, filterRegistry } from "../src/provider-registry.js";
 
 const api = createLocalDemoApi();
 const form = document.querySelector("#query-form");
@@ -93,4 +94,59 @@ form.addEventListener("submit", async (event) => {
   }
 });
 
+const capabilityFilter = document.querySelector("#capability-filter");
+const kindFilter = document.querySelector("#kind-filter");
+const catalogStatus = document.querySelector("#catalog-status");
+const providerCatalog = document.querySelector("#provider-catalog");
+
+function appendTextElement(parent, tagName, text, className) {
+  const element = document.createElement(tagName);
+  element.textContent = text;
+  if (className) element.className = className;
+  parent.append(element);
+  return element;
+}
+
+function renderProviderCatalog() {
+  const entries = filterRegistry(INITIAL_REGISTRY, {
+    capability: capabilityFilter.value || undefined,
+    kind: kindFilter.value || undefined
+  });
+  providerCatalog.replaceChildren();
+
+  for (const entry of entries) {
+    const card = document.createElement("li");
+    card.className = "provider-card";
+    const heading = document.createElement("div");
+    heading.className = "provider-card-heading";
+    appendTextElement(heading, "h3", entry.name);
+    appendTextElement(heading, "span", entry.kind.replaceAll("_", " "), "provider-kind");
+    card.append(heading);
+    appendTextElement(card, "p", `Connection: ${entry.connectionState.replaceAll("_", " ")} · Evidence: ${entry.verificationStatus.replaceAll("_", " ")}`, "provider-state");
+    appendTextElement(card, "p", entry.capabilities.join(" · "), "provider-capabilities");
+    appendTextElement(card, "p", entry.limitations.join(" "), "provider-limitation");
+
+    const evidence = entry.evidence[0];
+    if (evidence) {
+      const link = document.createElement("a");
+      link.href = evidence.sourceUrl;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "Evidence starting point";
+      link.setAttribute("aria-label", `Evidence starting point for ${entry.name} (opens in a new tab)`);
+      card.append(link);
+      appendTextElement(card, "p", evidence.establishes, "provider-evidence-note");
+      appendTextElement(card, "p", evidence.retrievedAt ? `Reviewed: ${evidence.retrievedAt}` : "Source review date: not recorded", "provider-evidence-date");
+    }
+    providerCatalog.append(card);
+  }
+
+  catalogStatus.textContent = entries.length
+    ? `${entries.length} catalogue entries · all seeded entries are unconfigured and unverified.`
+    : "No catalogue entries match these filters. Try another capability or category.";
+}
+
+capabilityFilter.addEventListener("change", renderProviderCatalog);
+kindFilter.addEventListener("change", renderProviderCatalog);
+renderProviderCatalog();
 checkHealth();
