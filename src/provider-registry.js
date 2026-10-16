@@ -154,12 +154,22 @@ export function validateRegistryEntry(entry) {
       return { ok: false, error: `Registry field '${field}' must be an array of strings.` };
     }
   }
-  if (!Array.isArray(value.evidence) || !value.evidence.every((item) =>
-    item && typeof item.sourceUrl === "string" && /^https:\/\//.test(item.sourceUrl) &&
-    (item.retrievedAt === null || typeof item.retrievedAt === "string") &&
-    typeof item.establishes === "string"
-  )) {
-    return { ok: false, error: "Evidence must contain an HTTPS source URL, explicit review date or null, and a statement of what it establishes." };
+  if (!Array.isArray(value.evidence) || value.evidence.length === 0 || !value.evidence.every((item) => {
+    if (!item || typeof item !== "object" || typeof item.sourceUrl !== "string" ||
+        typeof item.establishes !== "string" || !item.establishes.trim()) return false;
+    let source;
+    try {
+      source = new URL(item.sourceUrl);
+    } catch {
+      return false;
+    }
+    if (source.protocol !== "https:" || !source.hostname || source.username || source.password) return false;
+    if (item.retrievedAt === null) return true;
+    if (typeof item.retrievedAt !== "string" || !/^\\d{4}-\\d{2}-\\d{2}$/.test(item.retrievedAt)) return false;
+    const date = new Date(`${item.retrievedAt}T00:00:00.000Z`);
+    return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === item.retrievedAt;
+  })) {
+    return { ok: false, error: "Evidence must contain at least one record with a valid HTTPS URL, an ISO calendar review date or explicit null, and a non-empty statement of what it establishes." };
   }
   return { ok: true, value: /** @type {CapabilityEntry} */ (value) };
 }
