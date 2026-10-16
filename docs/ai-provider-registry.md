@@ -1,44 +1,42 @@
-# AI provider registry — initial contract
+# AI provider registry and Explorer — initial proposal
 
-**Status:** Implemented foundation; not yet an approved cross-repository contract. The Explorer UI and a real provider integration are not implemented in this change.
+**Status:** Implemented app-local catalogue foundation; not an approved cross-repository contract. The catalogue is a research preview, not a live provider integration.
 
 ## Integrity rules
 
 - Registry records distinguish a provider ecosystem from a model, inference/deployment service, lifecycle tool, and specialized system.
-- The connection state describes actual integration/configuration state. It is not the same as evidence verification.
-- Verification status is one of unverified, documented, or independently_tested. Do not infer a higher status from vendor claims or a passing unit test.
-- Unknown information must stay unknown. Do not fill in model versions, context limits, prices, latency, hardware, license terms, or availability without evidence.
-- Each entry has evidence records containing an HTTPS source URL, a retrieval/review date or explicit null, and a statement of what the source establishes.
-- The initial records are seed examples. Their provider-specific details are unverified, and every entry is marked unconfigured. The listed source links are evidence starting points, not proof of all listed capabilities.
+- Connection/configuration state is separate from evidence verification.
+- Verification status is one of `unverified`, `documented`, or `independently_tested`. A passing unit test does not verify a vendor capability claim.
+- Unknown information stays unknown. Model versions, context limits, prices, latency, hardware requirements, license terms, and availability are not asserted as verified.
+- Every entry must include at least one evidence record with an HTTPS source URL, a valid ISO calendar review date or explicit `null`, and a non-empty statement of what the source establishes.
+- Seed entries remain `unconfigured` and `unverified`. Current source links are research starting points and do not establish every product-specific capability.
 - The mock adapter performs no network calls, loads no secrets, and must never be presented as a live provider integration.
 
 ## Entry fields
 
-The initial JavaScript module documents the typed shape using JSDoc:
-
-- id, name, providerId: stable identity and display labels.
-- kind: provider, model, inference_service, lifecycle_tool, or specialized_system.
-- capabilities, modalities, deploymentModes: filterable descriptive tags, not availability guarantees.
-- connectionState: unconfigured, available, or unavailable.
-- verificationStatus: unverified, documented, or independently_tested.
-- limitations: explicit caveats that must remain visible to consumers.
-- evidence: sourceUrl, retrievedAt, and establishes.
+- `id`, `name`, `providerId`: stable identity and display labels.
+- `kind`: `provider`, `model`, `inference_service`, `lifecycle_tool`, or `specialized_system`.
+- `capabilities`, `modalities`, `deploymentModes`: descriptive filter tags, not availability guarantees.
+- `connectionState`: `unconfigured`, `available`, or `unavailable`.
+- `verificationStatus`: `unverified`, `documented`, or `independently_tested`.
+- `limitations`: explicit caveats that remain visible to consumers.
+- `evidence`: source URL, review date, and a bounded statement of what that source establishes.
 
 ## Current implementation
 
-- Module: src/provider-registry.js
-- Tests: test/provider-registry.test.js
-- Registry validation and capability/category/status filtering are deterministic and local.
-- A mock adapter demonstrates the unconfigured/error boundary without exposing credentials or making a provider call.
-- npm run check includes syntax validation for the module and the complete Node test suite.
+- Registry module: `src/provider-registry.js`.
+- API: read-only `GET /api/v1/providers`, schema version 1, served from static local configuration.
+- UI: an AI Systems Explorer preview with category and capability filters, evidence links, limitations, and explicit connection/verification states.
+- Tests: registry validation/filtering, API contract and method behavior, and Chromium browser interaction/responsive smoke coverage.
+- The mock adapter demonstrates request validation and the unconfigured boundary without contacting a provider or handling credentials.
 
-## Next gates
+## Verification and next gates
 
-1. Check the existing GAIA-Standards, GAIA-Ontology, and GAIA-Architecture repositories for canonical capability/evidence terms before finalizing this schema.
-2. Verify each seeded entry against product-specific official documentation; record retrieval dates and precisely what each source supports.
-3. Add the accessible AI Systems Explorer UI and capability filters.
-4. Add UI tests for empty results, narrow viewports, keyboard operation, and truthful unconfigured/unverified states.
-5. Keep any real adapter server-side, with explicit secret handling, timeout/error redaction, and provider-specific tests.
-6. Do not implement autonomous routing until task-fit, evaluation, privacy, permissions, cost, latency, and deployment constraints have approved contracts.
+1. Confirm the capability and evidence vocabulary against the canonical `GAIA-Standards`, `GAIA-Ontology`, and `GAIA-Architecture` repositories before treating this as a shared contract.
+2. Review each seed entry against product-specific official documentation. Record the date reviewed and exactly what each source supports; otherwise leave claims unverified or remove unsupported tags.
+3. Expand validation tests for malformed evidence metadata and preserve explicit unknowns.
+4. Continue accessibility and browser checks for empty results, keyboard interaction, narrow viewports, and truthful unavailable states.
+5. Any real adapter must remain server-side and receive a separate security review for secrets, timeouts, error redaction, permissions, and provider-specific tests.
+6. Do not implement autonomous provider routing until task fit, evaluation, privacy, permissions, cost, latency, and deployment constraints have approved contracts.
 
-This module is an initial build increment, not evidence of live AI connectivity or production readiness.
+This increment provides a local catalogue preview only. It does not establish live AI connectivity, production readiness, or an approved cross-repository schema.
