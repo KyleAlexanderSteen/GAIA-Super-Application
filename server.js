@@ -4,6 +4,7 @@ import { extname, join, normalize, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateQueryRequest, QUERY_CONTRACT_VERSION } from "./src/contract.js";
 import { queryLocalKnowledge } from "./src/knowledge.js";
+import { INITIAL_REGISTRY, validateRegistryEntry } from "./src/provider-registry.js";
 
 const ROOT = fileURLToPath(new URL(".", import.meta.url));
 const PUBLIC_DIR = join(ROOT, "public");
@@ -65,7 +66,6 @@ async function serveStatic(pathname, method, response) {
       "referrer-policy": "no-referrer",
       "cache-control": "no-store"
     });
-    // HEAD returns the headers a GET would return, but never the representation body.
     response.end(method === "HEAD" ? undefined : data);
   } catch {
     response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
@@ -87,6 +87,25 @@ export function createAppServer() {
         status: "ok",
         mode: "local-demo",
         queryContractVersion: QUERY_CONTRACT_VERSION
+      });
+      return;
+    }
+
+    if (url.pathname === "/api/v1/providers") {
+      if (request.method !== "GET") {
+        response.writeHead(405, { allow: "GET" });
+        response.end("Method not allowed");
+        return;
+      }
+      const valid = INITIAL_REGISTRY.every((entry) => validateRegistryEntry(entry).ok);
+      if (!valid) {
+        sendJson(response, 500, { error: "The local provider catalogue is unavailable." });
+        return;
+      }
+      sendJson(response, 200, {
+        schemaVersion: 1,
+        source: { id: "public-app-local-seed-registry", kind: "static-configuration" },
+        providers: INITIAL_REGISTRY
       });
       return;
     }
