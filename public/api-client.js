@@ -36,6 +36,23 @@ export function createLocalDemoApi(fetchImpl = fetch) {
       });
       if (!response.ok) throw new Error("Service unavailable");
       return readJson(response, "The local service returned an unreadable health response.");
+    },
+
+    async providers() {
+      const response = await fetchImpl("/api/v1/providers", {
+        headers: { accept: "application/json" }
+      });
+      const data = await readJson(
+        response,
+        "The local provider catalogue returned an unreadable response."
+      );
+      if (!response.ok) {
+        throw new Error(data.error ?? "The local provider catalogue is unavailable.");
+      }
+      if (data.schemaVersion !== 1 || !Array.isArray(data.providers)) {
+        throw new Error("The local provider catalogue returned an unsupported response.");
+      }
+      return data;
     }
   };
 }

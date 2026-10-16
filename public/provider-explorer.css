@@ -1,0 +1,21 @@
+.provider-explorer { margin-top: 28px; scroll-margin-top: 20px; }
+.explorer-intro { max-width: 720px; margin: -8px 0 24px; color: var(--muted); }
+.explorer-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
+.explorer-filters select { width: 100%; min-height: 44px; padding: 9px 12px; border: 1px solid #cbd5cd; border-radius: var(--radius-field); background: #fcfdfc; color: var(--ink); font: inherit; }
+.explorer-filters select:focus-visible, .provider-card a:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
+.catalog-status { margin: 0 0 14px; color: var(--muted); font-size: .85rem; }
+.provider-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 0; margin: 0; list-style: none; }
+.provider-card { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: #fcfdfc; }
+.provider-card-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; }
+.provider-card h3 { margin: 0; font-size: 1rem; overflow-wrap: anywhere; }
+.provider-kind { padding: 3px 7px; border-radius: 6px; background: #eef0ed; color: var(--muted); font-size: .7rem; text-transform: capitalize; }
+.provider-state { margin: 12px 0 8px; font-size: .78rem; font-weight: 750; text-transform: capitalize; }
+.provider-capabilities { margin: 0 0 10px; color: var(--green-dark); font-size: .8rem; overflow-wrap: anywhere; }
+.provider-limitation, .provider-evidence-note, .provider-evidence-date { color: var(--muted); font-size: .78rem; overflow-wrap: anywhere; }
+.provider-limitation { margin: 0 0 12px; }
+.provider-card a { display: inline-block; color: var(--green-dark); font-size: .82rem; font-weight: 750; text-underline-offset: 3px; }
+.provider-evidence-note { margin: 8px 0 4px; }
+.provider-evidence-date { margin: 0; font-size: .72rem; }
+@media (max-width: 620px) {
+  .explorer-filters, .provider-grid { grid-template-columns: minmax(0, 1fr); }
+}

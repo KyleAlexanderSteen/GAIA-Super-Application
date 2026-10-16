@@ -4,9 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f3f5f2">
-    <meta name="description" content="GAIA public application — local knowledge-query prototype.">
+    <meta name="description" content="GAIA public application — local knowledge-query prototype and AI systems catalogue preview.">
     <title>GAIA — Knowledge Explorer</title>
     <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/provider-explorer.css">
     <script type="module" src="/app.js"></script>
   </head>
   <body>
@@ -21,6 +22,7 @@
 
     <nav class="workspace-nav" aria-label="Primary workspaces">
       <a class="workspace-link" href="/" aria-current="page">Knowledge <span class="nav-state">Available</span></a>
+      <a class="workspace-link" href="#ai-systems">AI Systems <span class="nav-state">Preview</span></a>
       <button class="workspace-link" type="button" disabled>Chat <span class="nav-state">Planned</span></button>
       <button class="workspace-link" type="button" disabled>Research <span class="nav-state">Planned</span></button>
       <button class="workspace-link" type="button" disabled>Projects <span class="nav-state">Planned</span></button>
@@ -72,13 +74,55 @@
         </section>
       </section>
 
+      <section id="ai-systems" class="workspace provider-explorer" aria-labelledby="ai-systems-title">
+        <div class="workspace-heading">
+          <div>
+            <p class="eyebrow">AI SYSTEMS · CATALOGUE PREVIEW</p>
+            <h2 id="ai-systems-title">Explore AI ecosystems and capabilities</h2>
+          </div>
+          <span class="health-badge" data-state="unverified">No providers connected</span>
+        </div>
+        <p class="explorer-intro">Browse an initial, local catalogue. These entries are illustrative research leads—not verified capability claims, live availability, or endorsements.</p>
+        <div class="explorer-filters">
+          <div>
+            <label for="capability-filter">Filter by capability</label>
+            <select id="capability-filter">
+              <option value="">All capabilities</option>
+              <option value="reasoning">Reasoning</option>
+              <option value="coding">Coding</option>
+              <option value="vision">Vision</option>
+              <option value="inference">Inference</option>
+              <option value="simulation">Simulation</option>
+              <option value="model-development">Model development</option>
+              <option value="audio">Audio</option>
+              <option value="image-generation">Image generation</option>
+              <option value="embeddings">Embeddings</option>
+            </select>
+          </div>
+          <div>
+            <label for="kind-filter">Filter by category</label>
+            <select id="kind-filter">
+              <option value="">All categories</option>
+              <option value="provider">Provider ecosystem</option>
+              <option value="model">Model</option>
+              <option value="inference_service">Inference service</option>
+              <option value="lifecycle_tool">Lifecycle tooling</option>
+              <option value="specialized_system">Specialized system</option>
+            </select>
+          </div>
+        </div>
+        <p id="catalog-status" class="catalog-status" role="status" aria-live="polite">Loading local catalogue…</p>
+        <ul id="provider-catalog" class="provider-grid" aria-label="AI provider and system catalogue"></ul>
+      </section>
+
       <section class="footer-note" aria-label="Prototype limitations">
         <h2>What this prototype demonstrates</h2>
         <ul>
           <li>A versioned request/response boundary.</li>
           <li>Source-labelled knowledge fixtures and explicit no-match behavior.</li>
           <li>Accessible loading, error, and result states.</li>
-          <li>A workspace navigation shell that clearly distinguishes available from planned areas.</li>
+          <li>A workspace navigation shell that distinguishes available from planned areas.</li>
+          <li>A local AI catalogue with separate evidence and connection states.</li>
         </ul>
         <p>Authentication, personal memory, external tools, live providers, and privileged operations are intentionally out of scope.</p>
       </section>

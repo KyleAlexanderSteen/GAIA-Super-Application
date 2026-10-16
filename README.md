@@ -2,9 +2,9 @@
 
 The public-facing GAIA application. This repository owns the public product UI and its API client; shared runtime/business logic belongs in the approved GAIA service repositories.
 
-## Phase A: local knowledge-query slice
+## Phase A: local knowledge and AI catalogue slices
 
-This is a **local-only development prototype** that establishes the application shell, a versioned request/response boundary, provenance-labelled fixture data, failure states, repeatable tests, and a workspace navigation foundation.
+This is a **local-only development prototype** that establishes the application shell, versioned request/response boundaries, provenance-labelled fixture data, failure states, repeatable tests, and workspace navigation.
 
 It is not a live GAIA runtime integration and is not a production deployment.
 
@@ -38,33 +38,29 @@ npm run check
 
 The test suite uses Node's built-in test runner for API/server checks and Playwright with Chromium for real-browser interaction smoke tests. CI installs development dependencies and Chromium, then runs syntax checks, unit/HTTP tests, and browser tests on pull requests and pushes to `main`.
 
-Browser checks currently cover keyboard skip-link behavior, a successful local-fixture query with provenance, blank-query handling, navigation labels, and narrow-viewport horizontal overflow. These are focused regression checks—not a full WCAG audit, assistive-technology certification, or cross-browser test matrix.
-
-### Design conventions
-
-See [`docs/design-system.md`](docs/design-system.md) for the initial color, spacing, shape, accessibility, UI-state, API-adapter, and browser-verification conventions. The token set is a foundation; a full visual/accessibility audit remains outstanding.
+Browser checks cover keyboard skip-link behavior, a successful local-fixture query with provenance, blank-query handling, workspace navigation, the AI Systems Explorer catalogue and category/capability filters, and narrow-viewport horizontal overflow. These are focused regression checks—not a full WCAG audit, assistive-technology certification, or cross-browser test matrix.
 
 ### What works in this phase
 
 - Responsive, keyboard-friendly public application shell.
-- Primary workspace navigation with Knowledge marked as available.
+- Primary navigation to the Knowledge workspace and an AI Systems catalogue preview.
 - Chat, Research, Projects, Agents / Automation, Memory, and Settings shown as planned and disabled until implemented.
 - Query form with loading, success, no-match, and error feedback.
-- Local deterministic search over a small fixture set.
-- Source metadata: stable fixture ID, title, source type, and version.
-- Versioned local request/response contract, isolated behind a browser-side local-demo adapter.
-- Health endpoint and bounded request validation.
-- Automated server/API and Chromium browser tests for key interactions and selected accessibility/responsive behaviors.
+- Local deterministic search over a small fixture set, with source metadata.
+- Versioned local query contract behind a browser-side adapter.
+- Read-only versioned `GET /api/v1/providers` endpoint for the seed catalogue.
+- Registry validation and capability/category filtering; provider, model, inference service, lifecycle tool, and specialized system are distinct categories.
+- Explicit unconfigured/unverified status, limitations, and evidence starting points for every seed entry.
+- Mock adapter contract that makes no network calls and does not handle credentials.
+- Automated server/API, registry, and Chromium browser tests for selected behaviors.
 
-### Explicit limitations
+### AI catalogue status and limitations
 
-- The interface says **Local prototype** and responses identify themselves as `local-demo`.
-- No live AI provider, API Gateway, authentication, personal memory, external tool, or privileged operation is connected.
-- The local fixture data is demonstration material, not authoritative GAIA knowledge.
-- The local query endpoint is not an authenticated production API. Do not expose this development server to the public internet.
-- Navigation for unimplemented workspaces is intentionally disabled; no live functionality is implied.
-- The Content Security Policy and input validation are prototype hardening, not a substitute for the approved GAIA security model.
-- No production readiness or integration verification is claimed by this scaffold.
+The AI Systems Explorer is a **catalogue preview**, not a provider integration. Initial entries include the NVIDIA ecosystem and illustrative records for Nemotron, NIM, NeMo, Earth-2, and Cosmos, plus an OpenAI ecosystem entry. Provider-specific capabilities are deliberately marked **unverified** and every entry is **unconfigured**. Evidence links are starting points, not proof of every listed claim; product-specific source review and review dates remain outstanding.
+
+No live AI provider, API Gateway, authentication, personal memory, external tool, or privileged operation is connected. No model versions, prices, latency, context limits, hardware requirements, or license terms are asserted as verified. The local fixture data is demonstration material, not authoritative GAIA knowledge.
+
+The local endpoints are not authenticated production APIs. Do not expose this development server to the public internet. The Content Security Policy and input validation are prototype hardening, not a substitute for the approved GAIA security model. No production readiness or integration verification is claimed.
 
 ### Architecture decisions still required
 
@@ -74,5 +70,7 @@ Before connecting real services, reconcile the legacy `GAIA-3.0` Rust workspace 
 - [GAIA-Documentation #167 — monorepo/multi-repo ADR](https://github.com/KyleAlexanderSteen/GAIA-Documentation/issues/167)
 - [GAIA-Documentation #172 — dependency and contract manifest](https://github.com/KyleAlexanderSteen/GAIA-Documentation/issues/172)
 - [GAIA-Documentation #212 — requirements traceability](https://github.com/KyleAlexanderSteen/GAIA-Documentation/issues/212)
+
+The registry is an initial app-local proposal, not yet an approved cross-repository contract. Compare its capability/evidence vocabulary with `GAIA-Standards`, `GAIA-Ontology`, and `GAIA-Architecture` before expanding it. See [the registry design and verification gates](docs/ai-provider-registry.md).
 
 Never add provider keys, owner credentials, private Master Application code, or privileged control-plane routes to this public repository.
