@@ -11,7 +11,7 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "test": "node --test",
-    "check": "node --check server.js && node --check src/contract.js && node --check src/knowledge.js && node --check src/integrity-gate.js && node --check public/app.js && node --check public/api-client.js && node --test"
+    "check": "node --check server.js && node --check src/contract.js && node --check src/knowledge.js && node --check src/integrity-gate.js && node --check src/provider-registry.js && node --check public/app.js && node --check public/api-client.js && node --test"
   },
   "devDependencies": {
     "playwright": "^1.56.1"
