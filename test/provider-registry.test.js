@@ -62,3 +62,38 @@ test("mock adapter fails closed when unconfigured and never claims to call a pro
   assert.match(result.result.note, /no provider was called/i);
   assert.equal(JSON.stringify(result).includes("api_key"), false);
 });
+
+test("registry evidence validation rejects missing evidence and malformed review metadata", () => {
+  assert.equal(validateRegistryEntry({
+    ...INITIAL_REGISTRY[0],
+    evidence: []
+  }).ok, false);
+
+  assert.equal(validateRegistryEntry({
+    ...INITIAL_REGISTRY[0],
+    evidence: [{
+      sourceUrl: "https://www.nvidia.com/en-us/ai/",
+      retrievedAt: "yesterday",
+      establishes: "A source statement."
+    }]
+  }).ok, false);
+
+  assert.equal(validateRegistryEntry({
+    ...INITIAL_REGISTRY[0],
+    evidence: [{
+      sourceUrl: "https://user:password@example.com/evidence",
+      retrievedAt: null,
+      establishes: "A source statement."
+    }]
+  }).ok, false);
+
+  assert.equal(validateRegistryEntry({
+    ...INITIAL_REGISTRY[0],
+    evidence: [{
+      sourceUrl: "https://example.com/evidence",
+      retrievedAt: null,
+      establishes: "   "
+    }]
+  }).ok, false);
+});
+
