@@ -46,8 +46,10 @@ Browser checks cover keyboard skip-link behavior, a successful local-fixture que
 - Primary navigation to the Knowledge workspace and an AI Systems catalogue preview.
 - Chat, Research, Projects, Agents / Automation, Memory, and Settings shown as planned and disabled until implemented.
 - Query form with loading, success, no-match, and error feedback.
+- Versioned read-only knowledge catalogue API (`GET /api/v1/knowledge`) for transparent inspection of the local fixture set.
 - Local deterministic search over a small fixture set, with source metadata.
 - Versioned local query contract behind a browser-side adapter.
+- Read-only `GET /api/v1/knowledge` catalogue exposing fixture records with source, source type, and version provenance; the response explicitly identifies itself as local demonstration data.
 - Read-only versioned `GET /api/v1/providers` endpoint for the seed catalogue.
 - Registry validation and capability/category filtering; provider, model, inference service, lifecycle tool, and specialized system are distinct categories.
 - Explicit unconfigured/unverified status, limitations, and evidence starting points for every seed entry.
