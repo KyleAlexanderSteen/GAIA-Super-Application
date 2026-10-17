@@ -1,10 +1,7 @@
 /**
  * Application path that calls the GAIA-Core contract sequence.
- *
- * Source of truth for the rules is GAIA-Core:
- * require_approval, require_consent, require_provenance, AuthorityBoundary.
- * This module is the caller. It does not replace Core.
- * A missing check blocks before any side effect. Failure is never success.
+ * Source of truth is GAIA-Core. This module is the caller.
+ * A missing check blocks before any side effect.
  */
 
 export class PathBlocked extends Error {
@@ -16,9 +13,7 @@ export class PathBlocked extends Error {
 }
 
 function requireApproval(approval) {
-  if (!approval || approval.allow !== true) {
-    throw new PathBlocked("approval", "missing explicit allow");
-  }
+  if (!approval || approval.allow !== true) throw new PathBlocked("approval", "missing explicit allow");
   if (approval.withdrawn) throw new PathBlocked("approval", "allow withdrawn");
   if (!approval.who || !approval.what || !approval.when || !approval.scope) {
     throw new PathBlocked("approval", "allow record incomplete");
@@ -27,9 +22,7 @@ function requireApproval(approval) {
 }
 
 function requireConsent(consent, requiredScope) {
-  if (!consent || consent.granted !== true) {
-    throw new PathBlocked("consent", "missing consent");
-  }
+  if (!consent || consent.granted !== true) throw new PathBlocked("consent", "missing consent");
   if (consent.withdrawn) throw new PathBlocked("consent", "consent withdrawn");
   if (requiredScope && consent.scope !== requiredScope) {
     throw new PathBlocked("consent", "consent scope mismatch");
@@ -42,9 +35,7 @@ function requireProvenance(provenance) {
     throw new PathBlocked("provenance", "missing provenance");
   }
   const allowed = new Set(["verified", "unverified", "reconstructed", "unavailable"]);
-  if (!allowed.has(provenance.evidence)) {
-    throw new PathBlocked("provenance", "evidence state invalid");
-  }
+  if (!allowed.has(provenance.evidence)) throw new PathBlocked("provenance", "evidence state invalid");
   return provenance;
 }
 
@@ -53,41 +44,41 @@ function enforceAuthority(boundary, requested) {
     throw new PathBlocked("authority", "boundary incomplete");
   }
   const allowed = new Set(boundary.allowed);
-  const outside = requested.filter((scope) => !allowed.has(scope));
+  const outside = (requested || []).filter((scope) => !allowed.has(scope));
   if (outside.length > 0) {
     throw new PathBlocked("authority", `scope expansion requires re-authorisation: ${outside.join(",")}`);
   }
   return boundary;
 }
 
-/**
- * Run one action through the four gates, then the side effect.
- * Side effect is not called if any gate throws.
- */
+function auditOf(input, status, extra = {}) {
+  return {
+    intended: input.requested || [],
+    observed: status,
+    protected: input.boundary?.principal || "unknown",
+    pays: input.approval?.who || "unknown",
+    epistemicStatus: input.provenance?.evidence || "unknown",
+    ...extra
+  };
+}
+
 export function runAction(input, sideEffect) {
-  const audit = { steps: [], status: "blocked" };
+  const steps = [];
   try {
     requireApproval(input.approval);
-    audit.steps.push("approval");
+    steps.push("approval");
     requireConsent(input.consent, input.requiredScope);
-    audit.steps.push("consent");
+    steps.push("consent");
     requireProvenance(input.provenance);
-    audit.steps.push("provenance");
+    steps.push("provenance");
     enforceAuthority(input.boundary, input.requested || []);
-    audit.steps.push("authority");
-    if (typeof sideEffect !== "function") {
-      throw new PathBlocked("execute", "no side effect");
-    }
+    steps.push("authority");
+    if (typeof sideEffect !== "function") throw new PathBlocked("execute", "no side effect");
     const result = sideEffect(input);
-    audit.status = "executed";
-    audit.result = result;
-    return { ok: true, audit };
+    return { ok: true, audit: auditOf(input, "executed", { steps, result }) };
   } catch (err) {
     if (err instanceof PathBlocked) {
-      audit.status = "blocked";
-      audit.blockedAt = err.step;
-      audit.reason = err.reason;
-      return { ok: false, audit };
+      return { ok: false, audit: auditOf(input, "refused", { steps, blockedAt: err.step, reason: err.reason }) };
     }
     throw err;
   }
