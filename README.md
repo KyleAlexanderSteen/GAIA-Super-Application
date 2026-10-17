@@ -48,6 +48,7 @@ Browser checks cover keyboard skip-link behavior, a successful local-fixture que
 - Query form with loading, success, no-match, and error feedback.
 - Local deterministic search over a small fixture set, with source metadata.
 - Versioned local query contract behind a browser-side adapter.
+- Read-only `GET /api/v1/knowledge` catalogue exposing fixture records with source, source type, and version provenance; the response explicitly identifies itself as local demonstration data.
 - Read-only versioned `GET /api/v1/providers` endpoint for the seed catalogue.
 - Registry validation and capability/category filtering; provider, model, inference service, lifecycle tool, and specialized system are distinct categories.
 - Explicit unconfigured/unverified status, limitations, and evidence starting points for every seed entry.

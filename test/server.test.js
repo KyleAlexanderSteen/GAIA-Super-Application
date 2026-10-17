@@ -234,3 +234,36 @@ test("provides a keyboard skip link to the main content landmark", async () => {
     assert.match(css, /transform: translateY\(0\)/);
   });
 });
+
+
+test("versioned knowledge catalogue exposes fixture provenance without claiming canonical status", async () => {
+  await withServer(async (base) => {
+    const response = await fetch(`${base}/api/v1/knowledge`);
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(body.schemaVersion, 1);
+    assert.deepEqual(body.source, {
+      id: "public-app-local-demo-fixtures",
+      kind: "local_test_fixture"
+    });
+    assert.ok(Array.isArray(body.records));
+    assert.ok(body.records.length > 0);
+    for (const record of body.records) {
+      assert.ok(record.id);
+      assert.ok(record.title);
+      assert.ok(record.text);
+      assert.ok(record.provenance.source);
+      assert.equal(record.provenance.sourceType, "local_test_fixture");
+      assert.ok(record.provenance.version);
+    }
+  });
+});
+
+test("knowledge catalogue rejects unsupported methods", async () => {
+  await withServer(async (base) => {
+    const response = await fetch(`${base}/api/v1/knowledge`, { method: "POST" });
+    assert.equal(response.status, 405);
+    assert.equal(response.headers.get("allow"), "GET");
+  });
+});

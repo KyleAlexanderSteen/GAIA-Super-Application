@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { extname, join, normalize, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateQueryRequest, QUERY_CONTRACT_VERSION } from "./src/contract.js";
-import { queryLocalKnowledge } from "./src/knowledge.js";
+import { knowledgeFixtures, queryLocalKnowledge } from "./src/knowledge.js";
 import { INITIAL_REGISTRY, validateRegistryEntry } from "./src/provider-registry.js";
 
 const ROOT = fileURLToPath(new URL(".", import.meta.url));
@@ -112,6 +112,24 @@ export function createAppServer() {
         schemaVersion: 1,
         source: { id: "public-app-local-seed-registry", kind: "static-configuration" },
         providers: INITIAL_REGISTRY
+      });
+      return;
+    }
+
+    if (url.pathname === "/api/v1/knowledge") {
+      if (request.method !== "GET") {
+        response.writeHead(405, { allow: "GET" });
+        response.end("Method not allowed");
+        return;
+      }
+      // This is a transparent catalogue of local demonstration fixtures, not
+      // the canonical GAIA knowledge base or a live model-generated response.
+      sendJson(response, 200, {
+        schemaVersion: 1,
+        source: { id: "public-app-local-demo-fixtures", kind: "local_test_fixture" },
+        records: knowledgeFixtures.map(({ id, title, text, source, sourceType, version }) => ({
+          id, title, text, provenance: { source, sourceType, version }
+        }))
       });
       return;
     }
