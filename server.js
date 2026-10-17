@@ -28,15 +28,21 @@ function sendJson(response, status, body) {
 }
 
 async function readJsonBody(request) {
-  let body = "";
+  const chunks = [];
+  let totalBytes = 0;
   for await (const chunk of request) {
-    body += chunk;
-    if (Buffer.byteLength(body, "utf8") > MAX_BODY_BYTES) {
+    const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    totalBytes += bytes.byteLength;
+    // Enforce the limit before retaining or decoding the incoming chunk.
+    if (totalBytes > MAX_BODY_BYTES) {
       const error = new Error("Request body is too large.");
       error.statusCode = 413;
       throw error;
     }
+    chunks.push(bytes);
   }
+
+  const body = Buffer.concat(chunks, totalBytes).toString("utf8");
   try {
     return JSON.parse(body);
   } catch {
@@ -117,6 +123,12 @@ export function createAppServer() {
         return;
       }
       try {
+        const contentType = request.headers["content-type"]?.split(";")[0].trim().toLowerCase();
+        if (contentType !== "application/json") {
+          sendJson(response, 415, { error: "Content-Type must be application/json." });
+          return;
+        }
+
         const raw = await readJsonBody(request);
         const validated = validateQueryRequest(raw);
         if (!validated.ok) {
