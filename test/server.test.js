@@ -33,6 +33,36 @@ test("API routes return route-specific Allow headers", async () => {
   });
 });
 
+test("requires application/json for query requests", async () => {
+  await withServer(async (base) => {
+    const missing = await fetch(`${base}/api/query`, {
+      method: "POST",
+      body: JSON.stringify({ query: "knowledge provenance" })
+    });
+    assert.equal(missing.status, 415);
+    assert.match((await missing.json()).error, /content-type/i);
+
+    const wrong = await fetch(`${base}/api/query`, {
+      method: "POST",
+      headers: { "content-type": "text/plain" },
+      body: JSON.stringify({ query: "knowledge provenance" })
+    });
+    assert.equal(wrong.status, 415);
+  });
+});
+
+test("enforces request body limits in bytes for multibyte UTF-8 input", async () => {
+  await withServer(async (base) => {
+    const response = await fetch(`${base}/api/query`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ query: "🪨".repeat(3000) })
+    });
+    assert.equal(response.status, 413);
+    assert.match((await response.json()).error, /too large/i);
+  });
+});
+
 test("rejects oversized query bodies with 413", async () => {
   await withServer(async (base) => {
     const response = await fetch(`${base}/api/query`, {
