@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { validateQueryRequest, QUERY_CONTRACT_VERSION } from "./src/contract.js";
 import { knowledgeFixtures, queryLocalKnowledge } from "./src/knowledge.js";
 import { INITIAL_REGISTRY, validateRegistryEntry } from "./src/provider-registry.js";
+import { handleAction } from "./src/action-route.js";
 
 const ROOT = fileURLToPath(new URL(".", import.meta.url));
 const PUBLIC_DIR = join(ROOT, "public");
@@ -33,7 +34,6 @@ async function readJsonBody(request) {
   for await (const chunk of request) {
     const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
     totalBytes += bytes.byteLength;
-    // Enforce the limit before retaining or decoding the incoming chunk.
     if (totalBytes > MAX_BODY_BYTES) {
       const error = new Error("Request body is too large.");
       error.statusCode = 413;
@@ -41,7 +41,6 @@ async function readJsonBody(request) {
     }
     chunks.push(bytes);
   }
-
   const body = Buffer.concat(chunks, totalBytes).toString("utf8");
   try {
     return JSON.parse(body);
@@ -61,7 +60,6 @@ async function serveStatic(pathname, method, response) {
     response.end("Not found");
     return;
   }
-
   try {
     const data = await readFile(filePath);
     response.writeHead(200, {
@@ -89,11 +87,30 @@ export function createAppServer() {
         response.end("Method not allowed");
         return;
       }
-      sendJson(response, 200, {
-        status: "ok",
-        mode: "local-demo",
-        queryContractVersion: QUERY_CONTRACT_VERSION
-      });
+      sendJson(response, 200, { status: "ok", mode: "local-demo", queryContractVersion: QUERY_CONTRACT_VERSION });
+      return;
+    }
+
+    if (url.pathname === "/api/v1/actions") {
+      if (request.method !== "POST") {
+        response.writeHead(405, { allow: "POST" });
+        response.end("Method not allowed");
+        return;
+      }
+      try {
+        const contentType = request.headers["content-type"]?.split(";")[0].trim().toLowerCase();
+        if (contentType !== "application/json") {
+          sendJson(response, 415, { error: "Content-Type must be application/json." });
+          return;
+        }
+        const raw = await readJsonBody(request);
+        const outcome = handleAction(raw);
+        sendJson(response, outcome.status, outcome.body);
+      } catch (error) {
+        sendJson(response, error.statusCode ?? 500, {
+          error: error.statusCode ? error.message : "The local action path encountered an unexpected error."
+        });
+      }
       return;
     }
 
@@ -122,8 +139,6 @@ export function createAppServer() {
         response.end("Method not allowed");
         return;
       }
-      // This is a transparent catalogue of local demonstration fixtures, not
-      // the canonical GAIA knowledge base or a live model-generated response.
       sendJson(response, 200, {
         schemaVersion: 1,
         source: { id: "public-app-local-demo-fixtures", kind: "local_test_fixture" },
@@ -146,20 +161,14 @@ export function createAppServer() {
           sendJson(response, 415, { error: "Content-Type must be application/json." });
           return;
         }
-
         const raw = await readJsonBody(request);
         const validated = validateQueryRequest(raw);
         if (!validated.ok) {
           sendJson(response, 400, { error: validated.error });
           return;
         }
-
         const result = queryLocalKnowledge(validated.value.query);
-        sendJson(response, 200, {
-          mode: "local-demo",
-          contractVersion: QUERY_CONTRACT_VERSION,
-          ...result
-        });
+        sendJson(response, 200, { mode: "local-demo", contractVersion: QUERY_CONTRACT_VERSION, ...result });
       } catch (error) {
         sendJson(response, error.statusCode ?? 500, {
           error: error.statusCode ? error.message : "The local query service encountered an unexpected error."
@@ -168,7 +177,6 @@ export function createAppServer() {
       return;
     }
 
-    // Unknown API paths should not fall through to static-file lookup.
     if (url.pathname.startsWith("/api/")) {
       sendJson(response, 404, { error: "Not found" });
       return;
@@ -190,7 +198,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
     throw new Error("PORT must be an integer between 1 and 65535.");
   }
-
   createAppServer().listen(port, host, () => {
     console.log(`GAIA Phase A local demo listening at http://${host}:${port}`);
     console.log("Mode: local-demo; no live model provider or external service is connected.");
